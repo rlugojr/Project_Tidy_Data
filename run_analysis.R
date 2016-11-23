@@ -6,7 +6,7 @@ ipak <- function(pkg){
     sapply(pkg, require, character.only = TRUE)
 }
 
-libraries <- c("dtplyr","dplyr","readr","stringr", "tidyr")
+libraries <- c("data.table","dtplyr","dplyr","readr","stringr", "tidyr", "reshape2")
 ipak(libraries)
 
 rm("libraries","ipak")
@@ -81,20 +81,28 @@ trainData <- cbind(trainData, y_train)
 dtTemp <- rbind(testData, trainData)
 
 #join the activity_labels table to get the corresponding activity values
-dtAll <- inner_join(dtTemp, activity_labels, by = "activityID" )
+dtTemp <- inner_join(dtTemp, activity_labels, by = "activityID" )
+
+dtAll <- copy(dtTemp)
 
 #cleanup
-rm("subject_test","subject_train","testData","trainData","x_test_keep","x_train_keep","y_test","y_train", "dtTemp")
+rm("subject_test","subject_train","testData","trainData","x_test_keep","x_train_keep","y_test","y_train", "dtTemp", "activity_labels")
 
-#TODO: drop activityID
 #pivot data to make a row per obeservation using reshape2::melt()
+#and drop the "activityID" field
 colID <- c("activityID","subjectID","activityName")
-dtTidy <- melt(dtAll,id = colID, variable.name = "measurement")
+dtTidy <- dtAll %>%
+    melt(id = colID, variable.name = "measurement") %>%
+    select(-activityID) %>%
+    arrange(subjectID,activityName)
+
+#cleanup
+rm("dtAll", "colID")
 
 #create summarized tidy dataset.
 dtTidyAvg <- dtTidy %>%
-group_by(subjectID, activityName) %>%
-summarize(average = mean(value)) %>%
-arrange(subjectID, activityName)
+    group_by(subjectID, activityName, measurement) %>%
+    summarize(average = mean(value)) %>%
+    arrange(subjectID, activityName, measurement)
 
 
