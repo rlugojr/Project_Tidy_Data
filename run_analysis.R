@@ -20,17 +20,27 @@ if (!file.exists(sourceFile)) {
 }
 
 #extract only data used for analysis
-datafiles <- c("UCI HAR Dataset/test/subject_test.txt","UCI HAR Dataset/test/X_test.txt","UCI HAR Dataset/test/y_test.txt",
+datafiles <- c("UCI HAR Dataset/features.txt","UCI HAR Dataset/test/subject_test.txt","UCI HAR Dataset/test/X_test.txt","UCI HAR Dataset/test/y_test.txt",
                "UCI HAR Dataset/train/subject_train.txt","UCI HAR Dataset/train/X_train.txt","UCI HAR Dataset/train/y_train.txt")
 unzip(sourceFile, datafiles, list = FALSE, junkpaths = TRUE, exdir = "./data", unzip = "internal")
 
 #get loadfile names from extracted files
-loadfiles <- gsub("UCI HAR Dataset/(test/|train/)","",datafiles)
+loadfiles <- gsub("UCI HAR Dataset/(test/|train/)?","",datafiles)
 
 #load each file into its own table
 for (loadfile in loadfiles) {
+    if (loadfile == "features.txt") {
+        tblHeader <- read.delim(paste("./data/",loadfile, sep = ""), header = FALSE, sep = " ", stringsAsFactors = FALSE, col.names = c("num","name"))
+    } else {
 
-    tblname <- tolower(gsub(".txt","",loadfile))
+        tblname <- tolower(gsub(".txt","",loadfile))
 
-    assign(tblname, fread(paste("./data/",loadfile, sep = ""), header = FALSE))
+        assign(tblname, fread(paste("./data/",loadfile, sep = ""), header = FALSE))
+    }
 }
+
+#add column headers to "x" tables
+colnames(x_test) <- tblHeader$name
+colnames(x_train) <- tblHeader$name
+
+
