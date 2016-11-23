@@ -9,6 +9,8 @@ ipak <- function(pkg){
 libraries <- c("dtplyr","dplyr","readr","stringr")
 ipak(libraries)
 
+rm("libraries","ipak")
+
 #check for data folder.  Create one if none exists
 if (!file.exists("./data")) { dir.create("./data")}
 
@@ -20,7 +22,8 @@ if (!file.exists(sourceFile)) {
 }
 
 #extract only data used for analysis
-datafiles <- c("UCI HAR Dataset/features.txt","UCI HAR Dataset/test/subject_test.txt","UCI HAR Dataset/test/X_test.txt","UCI HAR Dataset/test/y_test.txt",
+datafiles <- c("UCI HAR Dataset/features.txt","UCI HAR Dataset/activity_labels.txt",
+               "UCI HAR Dataset/test/subject_test.txt","UCI HAR Dataset/test/X_test.txt","UCI HAR Dataset/test/y_test.txt",
                "UCI HAR Dataset/train/subject_train.txt","UCI HAR Dataset/train/X_train.txt","UCI HAR Dataset/train/y_train.txt")
 unzip(sourceFile, datafiles, list = FALSE, junkpaths = TRUE, exdir = "./data", unzip = "internal")
 
@@ -34,13 +37,33 @@ for (loadfile in loadfiles) {
     } else {
 
         tblname <- tolower(gsub(".txt","",loadfile))
-
         assign(tblname, fread(paste("./data/",loadfile, sep = ""), header = FALSE))
     }
 }
 
+rm("url","sourceFile","datafiles","loadfiles","loadfile","tblname")
+
 #add column headers to "x" tables
 colnames(x_test) <- tblHeader$name
 colnames(x_train) <- tblHeader$name
+
+#add colmn name to "y" tables
+colnames(y_test) <- "activityID"
+colnames(y_train) <- "activityID"
+
+#add colmn name to "y" tables
+colnames(subject_test) <- "SubjectID"
+colnames(subject_train) <- "SubjectID"
+
+testData <- data.table(subject_test, x_test, y_test)
+trainData <- data.table(subject_train, x_train, y_train)
+
+dtAll <- rbind(testData, trainData)
+
+rm("subject_test","subject_train","tblHeader","testData","trainData","x_test","x_train","y_test","y_train")
+
+
+
+
 
 
