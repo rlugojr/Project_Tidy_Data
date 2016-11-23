@@ -6,7 +6,7 @@ ipak <- function(pkg){
     sapply(pkg, require, character.only = TRUE)
 }
 
-libraries <- c("dtplyr","dplyr","readr","stringr")
+libraries <- c("dtplyr","dplyr","readr","stringr", "tidyr")
 ipak(libraries)
 
 rm("libraries","ipak")
@@ -61,25 +61,40 @@ colnames(subject_train) <- "subjectID"
 #add column name to activity_labels
 colnames(activity_labels)<-c("activityID", "activityName")
 
-#isolate column names to keep.
+#isolate names of columns to keep.
 keepCols <- x_test[,grep("(mean[^F]|std)",names(x_test))]
 
 #subset tables using column names to keep
 x_test_keep <- select(x_test, keepCols)
 x_train_keep <- select(x_train, keepCols)
 
+#cleanup
+rm("tblHeader","x_test","x_train")
+
+#Create single data.table for each type of dataset
 testData <- cbind(subject_test, x_test_keep)
 testData <- cbind(testData, y_test)
 trainData <- cbind(subject_train, x_train_keep)
 trainData <- cbind(trainData, y_train)
 
+#concat rows from both tables into one data.table
 dtTemp <- rbind(testData, trainData)
 
+#join the activity_labels table to get the corresponding activity values
 dtAll <- inner_join(dtTemp, activity_labels, by = "activityID" )
 
-rm("subject_test","subject_train","tblHeader","testData","trainData","x_test","x_train","y_test","y_train")
+#cleanup
+rm("subject_test","subject_train","testData","trainData","x_test_keep","x_train_keep","y_test","y_train", "dtTemp")
 
+#TODO: drop activityID
+#pivot data to make a row per obeservation using reshape2::melt()
+colID <- c("activityID","subjectID","activityName")
+dtTidy <- melt(dtAll,id = colID, variable.name = "measurement")
 
-
+#create summarized tidy dataset.
+dtTidyAvg <- dtTidy %>%
+group_by(subjectID, activityName) %>%
+summarize(average = mean(value)) %>%
+arrange(subjectID, activityName)
 
 
