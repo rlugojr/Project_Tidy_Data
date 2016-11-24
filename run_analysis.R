@@ -50,15 +50,17 @@ loadfiles <- gsub("UCI HAR Dataset/(test/|train/)?","",datafiles)
 
 print("loading files into data tables.")
 #load each file into its own table which is named dynamically using the file's name (sans extension)
-#handle the "features" table separately for use as the header of specific tables
 for (loadfile in loadfiles) {
     if (loadfile == "features.txt") {
+        #handle the "features" table separately for use as the header of specific tables
         tblHeader <- read.delim(paste0("./data/",loadfile), header = FALSE, sep = " ", stringsAsFactors = FALSE, col.names = c("num","name"))
     } else {
-
+        #load table into data.table using file name as the table name.
         tblname <- tolower(gsub(".txt","",loadfile))
         assign(tblname, fread(paste0("./data/",loadfile), header = FALSE))
     }
+    #update user on progress.
+    print(paste("table",tolower(gsub(".txt","",loadfile)),"has been loaded."))
 }
 
 #free up memory by removing unecessary objects
@@ -135,12 +137,15 @@ dtTidy <- dtAll %>%
     mutate(domain = ifelse(str_sub(measurement, start = 1, end = 1) == "t", "time","frequency"),
            signal_component = ifelse(str_count(measurement, "Body") != 0, "body", "gravity"),
            sensor = ifelse(str_count(measurement, "Acc") != 0, "accelerometer", "gyroscope"),
-           statistic = ifelse(str_count(measurement, "mean") != 0, "mean", "standard_deviation"),
+           statistic = ifelse(str_count(measurement, "mean") != 0, "mean", "std_dev"),
            jerk = ifelse(str_count(measurement, "Jerk") != 0, "TRUE", "FALSE"),
            magnitude = ifelse(str_count(measurement, "Mag") != 0,"TRUE", "FALSE"),
            axis = ifelse(str_detect(str_sub(measurement, start = str_length(measurement)),c("X","Y","Z")), (str_sub(measurement, start = str_length(measurement))), NA)) %>%
     select(subjectID,activityName,domain,signal_component, sensor, statistic, jerk, magnitude, axis, value) %>%
     arrange(subjectID,activityName,domain,signal_component, sensor, statistic, jerk, magnitude, axis, value)
+#display first tidy data.table.
+print("here is a glimpse of dtTidy")
+glimpse(dtTidy)
 
 #free up memory by removing unecessary objects
 rm("dtAll", "colID", "allColNames", "keepCols")
@@ -153,25 +158,25 @@ print("creating second tidy dataset.")
 #aggregated value column, from left to right.
 dtTidyAvg <- dtTidy %>%
     group_by(subjectID, activityName, domain, signal_component, sensor, statistic, jerk, magnitude, axis) %>%
-    summarize(average = mean(value)) %>%
+    summarize(obs = n(),average = mean(value)) %>%
     arrange(subjectID, activityName, domain, signal_component, sensor, statistic, jerk, magnitude, axis, average)
 
+#display second tidy data.table.
+print("here is a glimpse of dtTidyAvg")
+glimpse(dtTidyAvg)
 #write CSV files for each table to the "./data" folder.
 #Uncomment next 3 lines to export the data to files.
 #print("writing datasets to csv files in './data' folder.")
 #write.csv(dtTidy, "./data/tidy.csv", na = "NA")
-#write.csv(dtTidyAvg, "./data/tidyAvg.csv", na = "NA")
+write.csv(dtTidyAvg, "./data/tidyData.csv", na = "NA")
+print(paste("data table exported to", getwd(),"/data/tidyData.csv"))
 
 print(paste("processing completed at :", Sys.time()))
-print("take a glimpse!")
 
-#wait for the user to press "return"
-invisible(readline(prompt = "Press <Enter> to continue..."))
 
-#use glimpse() on both tables for user review of tables
-print("dtTidy")
-glimpse(dtTidy)
 
-print("dtTidyAvg")
-glimpse(dtTidyAvg)
+
+
+
+
 
