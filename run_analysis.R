@@ -1,3 +1,6 @@
+#Project Tidy Data
+#Ray Lugo, Jr
+
 #function to install and load libraries that are not already installed or loaded
 #using very cool approach found here https://gist.github.com/stevenworthington/3178163
 ipak <- function(pkg){
