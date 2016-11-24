@@ -83,7 +83,7 @@ dtTemp <- rbind(testData, trainData)
 #join the activity_labels table to get the corresponding activity values
 dtTemp <- inner_join(dtTemp, activity_labels, by = "activityID" )
 
-dtAll <- copy(dtTemp)
+dtAll <- as.data.table(dtTemp)
 
 #cleanup
 rm("subject_test","subject_train","testData","trainData","x_test_keep","x_train_keep","y_test","y_train", "dtTemp", "activity_labels")
@@ -94,15 +94,23 @@ colID <- c("activityID","subjectID","activityName")
 dtTidy <- dtAll %>%
     melt(id = colID, variable.name = "measurement") %>%
     select(-activityID) %>%
-    arrange(subjectID,activityName)
+    mutate(domain = ifelse(str_sub(measurement, start = 1, end = 1) == "t", "time","frequency"),
+           accelerator = ifelse(str_count(measurement, "Body") != 0, "body", "gravity"),
+           instrument = ifelse(str_count(measurement, "Acc") != 0, "accelerator", "gyroscope"),
+           statistic = ifelse(str_count(measurement, "mean") != 0, "mean", "standard_deviation"),
+           jerk = ifelse(str_count(measurement, "Jerk") != 0, "TRUE", "FALSE"),
+           magnitude = ifelse(str_count(measurement, "Mag") != 0,"TRUE", "FALSE"),
+           axis = ifelse(str_detect(str_sub(measurement, start = str_length(measurement)),c("X","Y","Z")), (str_sub(measurement, start = str_length(measurement))), NA)) %>%
+    select(subjectID,activityName,domain,accelerator, instrument, statistic, jerk, magnitude, axis, value) %>%
+    arrange(subjectID,activityName,domain,accelerator, instrument, statistic, jerk, magnitude, axis, value)
 
 #cleanup
-rm("dtAll", "colID")
+rm("dtAll", "colID", "allColNames", "keepCols")
 
 #create summarized tidy dataset.
 dtTidyAvg <- dtTidy %>%
-    group_by(subjectID, activityName, measurement) %>%
+    group_by(subjectID, activityName, domain, accelerator, instrument, statistic, jerk, magnitude, axis) %>%
     summarize(average = mean(value)) %>%
-    arrange(subjectID, activityName, measurement)
+    arrange(subjectID, activityName, domain, accelerator, instrument, statistic, jerk, magnitude, axis)
 
 
