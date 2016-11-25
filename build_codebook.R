@@ -2,19 +2,22 @@
 
 #Codebook of dtTidy metadata
 
-code.book.dtTidyAvg <- list(
-    subjectID = unique(dtTidyAvg$subjectID),
-    activityName = unique(dtTidyAvg$activityName),
-    domain = unique(dtTidyAvg$domain),
-    signal_type = unique(dtTidyAvg$signal_type),
-    sensor = unique(dtTidyAvg$sensor),
-    statistic = unique(dtTidyAvg$statistic),
-    jerk = unique(dtTidyAvg$jerk),
-    magnitude = unique(dtTidyAvg$magnitude),
-    axis = unique(dtTidyAvg$axis),
-    obs = unique(dtTidyAvg$obs),
-    average = dtTidyAvg$average
+code.book.dtTidyAvg <- data.frame(
+    subjectID <- unique(dtTidyAvg$subjectID),
+    activityName <- unique(dtTidyAvg$activityName),
+    domain <- unique(dtTidyAvg$domain),
+    signal_type <- unique(dtTidyAvg$signal_type),
+    sensor <- unique(dtTidyAvg$sensor),
+    statistic <- unique(dtTidyAvg$statistic),
+    jerk <- unique(dtTidyAvg$jerk),
+    magnitude <- unique(dtTidyAvg$magnitude),
+    axis <- unique(dtTidyAvg$axis),
+    obs <- describe(dtTidyAvg$obs),
+    average <- describe(dtTidyAvg$average)
 )
+
+description(code.book.dtTidyAvg) <- "Tidy, agreggated version of original dataset."
+wording(code.book.dtTidyAvg) <- "Tidy version of original dataset, aggregated by observational variables and calculating the mean(value) of the included observations."
 
 code.book.dtTidyAvg  <- within(code.book.dtTidyAvg, {
     description(subjectID) <- "Study Participant ID number."
@@ -43,23 +46,25 @@ code.book.dtTidyAvg  <- within(code.book.dtTidyAvg, {
 
     #measurement(average) <- "interval"
 
-    foreach(x = c(obs,average),{
+    foreach(x <- c(obs,average),{
         annotation(x)["Remark"] <- "These measurements were sampled accross the dataset without specifying variables.  Therefore the calculated values above do not reflect any actual observations."
     })
 })
 
-description(code.book.dtTidyAvg) <- "Tidy, agreggated version of original dataset."
-wording(code.book.dtTidyAvg) <- "Tidy version of original dataset, aggregated by observational variables and calculating the mean(value) of the included observations."
+
 
 description(code.book.dtTidyAvg)
 
-dim(dtTidyAvg)
-head(dtTidyAvg)
-tail(dtTidyAvg)
+codebook(code.book.dtTidyAvg)
 
-glimpse(dtTidyAvg)
 
-summary(dtTidyData)
+#dim(dtTidyAvg)
+#head(dtTidyAvg)
+#tail(dtTidyAvg)
+
+#glimpse(dtTidyAvg)
+
+#summary(dtTidyAvg)
 
 
 
