@@ -1,5 +1,21 @@
-#Project Tidy Data
-#Ray Lugo, Jr
+#Project Tidy Data - run_analysis.R
+#Getting and Cleaning Data
+#by Ray Lugo, Jr.
+#2016-11-25
+
+#The purpose of "run_analysis.R" is to:
+#1. Merge the training and the test sets to create one data set.
+#2. Extract only the measurements on the mean and standard deviation for each measurement.
+#3. Use descriptive activity names to name the activities in the data set.
+#4. Appropriately labels the data set with descriptive variable names.
+#5. From the data set in step 4, creates a second, independent tidy data set with the average of each variable for each activity and each subject.
+
+#_______________________________________________________________________________
+
+#Script Begins
+
+#clear workspace of prior objects to free memory.
+rm(list = ls())
 
 #function to install and load libraries that are not already installed or loaded
 #using very cool approach found here https://gist.github.com/stevenworthington/3178163
@@ -10,6 +26,7 @@ ipak <- function(pkg){
     sapply(pkg, require, character.only = TRUE)
 }
 print(paste("started at :", Sys.time()))
+
 print("loading libraries.")
 #create vector of libraries and pass into the above function.
 libraries <- c("data.table","dtplyr","dplyr","readr","stringr", "tidyr", "reshape2")
@@ -64,7 +81,7 @@ for (loadfile in loadfiles) {
 }
 
 #free up memory by removing unecessary objects
-rm("url","sourceFile","datafiles","loadfiles","loadfile","tblname")
+#rm("url","sourceFile","datafiles","loadfiles","loadfile","tblname")
 
 print("adding column names.")
 #get column names from headers table
@@ -91,13 +108,13 @@ activity_labels$activityName <- tolower(activity_labels$activityName)
 
 #isolate names of columns to keep.
 #using "grep" and a simple regex that identifies "mean" or "std"
-keepCols <- x_test[,grep("(mean[^F]|std)",names(x_test))]
+keepCols <- grep("(mean[^F]|std)",names(x_test))
 
 print("creating tables for processing")
 #create new tables using subset of columns from "x" tables
 #keeping only the identified column names.
-x_test_keep <- select(x_test, keepCols)
-x_train_keep <- select(x_train, keepCols)
+x_test_keep <- dplyr::select(x_test, keepCols)
+x_train_keep <- dplyr::select(x_train, keepCols)
 
 #free up memory by removing unecessary objects
 rm("tblHeader","x_test","x_train")
@@ -133,16 +150,16 @@ print("creating first tidy dataset.")
 colID <- c("activityID","subjectID","activityName")
 dtTidy <- dtAll %>%
     melt(id = colID, variable.name = "measurement") %>%
-    select(-activityID) %>%
+    dplyr::select(-activityID) %>%
     mutate(domain = ifelse(str_sub(measurement, start = 1, end = 1) == "t", "time","frequency"),
-           signal_component = ifelse(str_count(measurement, "Body") != 0, "body", "gravity"),
+           signal_type = ifelse(str_count(measurement, "Body") != 0, "body", "gravity"),
            sensor = ifelse(str_count(measurement, "Acc") != 0, "accelerometer", "gyroscope"),
            statistic = ifelse(str_count(measurement, "mean") != 0, "mean", "std_dev"),
            jerk = ifelse(str_count(measurement, "Jerk") != 0, "TRUE", "FALSE"),
            magnitude = ifelse(str_count(measurement, "Mag") != 0,"TRUE", "FALSE"),
            axis = ifelse(str_detect(str_sub(measurement, start = str_length(measurement)),c("X","Y","Z")), (str_sub(measurement, start = str_length(measurement))), NA)) %>%
-    select(subjectID,activityName,domain,signal_component, sensor, statistic, jerk, magnitude, axis, value) %>%
-    arrange(subjectID,activityName,domain,signal_component, sensor, statistic, jerk, magnitude, axis, value)
+    dplyr::select(subjectID,activityName,domain,signal_type, sensor, statistic, jerk, magnitude, axis, value) %>%
+    arrange(subjectID,activityName,domain,signal_type, sensor, statistic, jerk, magnitude, axis, value)
 #display first tidy data.table.
 print("here is a glimpse of dtTidy")
 glimpse(dtTidy)
@@ -157,26 +174,26 @@ print("creating second tidy dataset.")
 #arrange the resulting set so that variable columns are listed before the
 #aggregated value column, from left to right.
 dtTidyAvg <- dtTidy %>%
-    group_by(subjectID, activityName, domain, signal_component, sensor, statistic, jerk, magnitude, axis) %>%
+    group_by(subjectID, activityName, domain, signal_type, sensor, statistic, jerk, magnitude, axis) %>%
     summarize(obs = n(),average = mean(value)) %>%
-    arrange(subjectID, activityName, domain, signal_component, sensor, statistic, jerk, magnitude, axis, average)
+    arrange(subjectID, activityName, domain, signal_type, sensor, statistic, jerk, magnitude, axis, average)
 
 #display second tidy data.table.
 print("here is a glimpse of dtTidyAvg")
 glimpse(dtTidyAvg)
+
+#Validate resulting tables by joining and comparing count of rows
+dtMatch <- inner_join(dtTidy,dtTidyAvg)
+ifelse(count(dtMatch) == count(dtTidy),print("results validated!"),print("Did not pass validation.  Check script and data."))
+rm("dtMatch")
+
 #write CSV files for each table to the "./data" folder.
 #Uncomment next 3 lines to export the data to files.
 #print("writing datasets to csv files in './data' folder.")
 #write.csv(dtTidy, "./data/tidy.csv", na = "NA")
-write.csv(dtTidyAvg, "./data/tidyData.csv", na = "NA")
-print(paste("data table exported to", getwd(),"/data/tidyData.csv"))
+write.table(dtTidyAvg, "./data/tidyData.csv", quote = FALSE, na = "NA")
+print(paste0("data table exported to ", getwd(),"/data/UCI_Analysis_Tidy_Data.txt"))
 
 print(paste("processing completed at :", Sys.time()))
 
-
-
-
-
-
-
-
+#Script Ends
