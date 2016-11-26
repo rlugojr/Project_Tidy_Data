@@ -1,28 +1,22 @@
-#Ray Lugo, Jr
-
 #Codebook of dtTidy metadata
+#Project Tidy Data - build_codebook.R
+#Getting and Cleaning Data
+#by Ray Lugo, Jr.
+#2016-11-25
 
-code.book.dtTidyAvg <- data.frame(
-    subjectID <- unique(dtTidyAvg$subjectID),
-    activityName <- unique(dtTidyAvg$activityName),
-    domain <- unique(dtTidyAvg$domain),
-    signal_type <- unique(dtTidyAvg$signal_type),
-    sensor <- unique(dtTidyAvg$sensor),
-    statistic <- unique(dtTidyAvg$statistic),
-    jerk <- unique(dtTidyAvg$jerk),
-    magnitude <- unique(dtTidyAvg$magnitude),
-    axis <- unique(dtTidyAvg$axis),
-    obs <- describe(dtTidyAvg$obs),
-    average <- describe(dtTidyAvg$average)
-)
+#The purpose of this script is to create metadata that can be used to generate a codebook
+#which details the table, columns and values contained in the final data set, including
+#cursory statistics for each.
 
-description(code.book.dtTidyAvg) <- "Tidy, agreggated version of original dataset."
-wording(code.book.dtTidyAvg) <- "Tidy version of original dataset, aggregated by observational variables and calculating the mean(value) of the included observations."
 
-code.book.dtTidyAvg  <- within(code.book.dtTidyAvg, {
+library(memisc)
+
+Data <- as.data.set(tbl_df(dtTidyAvg))
+
+Data  <- within(Data, {
     description(subjectID) <- "Study Participant ID number."
     description(activityName) <- "Activity performed when observation was recorded."
-    description(domain) <- "Time-domain(t) only or Fast Fourier Transform(f) applied."
+    description(domain) <- "Time-domain (t) only or Fast-Fourier Transform (f) applied."
     description(signal_type) <- "Categorization of generated signal."
     description(sensor) <- "The measurement instrument."
     description(statistic) <- "Statistical function applied."
@@ -44,28 +38,26 @@ code.book.dtTidyAvg  <- within(code.book.dtTidyAvg, {
     wording(obs) <- "The number of observations used to calculate the average"
     wording(average) <- "The average of the recorded and calculated measurements for aggregted observational variables."
 
-    #measurement(average) <- "interval"
-
     foreach(x <- c(obs,average),{
         annotation(x)["Remark"] <- "These measurements were sampled accross the dataset without specifying variables.  Therefore the calculated values above do not reflect any actual observations."
     })
 })
 
+#build "object" to hold report parts
+code.book.dtTidyAvg <- codebook(Data)
+code.book.dtTidyAvg.tableName <- "tidyDataAvg"
+code.book.dtTidyAvg.columnDefs <- description(Data)
+code.book.dtTidyAvg.description <- "Tidy, agreggated dataset."
+code.book.dtTidyAvd.wording <- "Tidy version of original dataset, aggregated by observational variables and calculating the mean(value) of the included observations."
 
-
-description(code.book.dtTidyAvg)
-
-codebook(code.book.dtTidyAvg)
-
-
-#dim(dtTidyAvg)
-#head(dtTidyAvg)
-#tail(dtTidyAvg)
-
-#glimpse(dtTidyAvg)
-
-#summary(dtTidyAvg)
-
-
+#example report
+cat("\n","-------------------------------------------------------------------\n\n", sep = "")
+cat(code.book.dtTidyAvg.tableName, " - ", code.book.dtTidyAvg.description, "\n\n", sep = "")
+cat(code.book.dtTidyAvd.wording, "\n\n", sep = "")
+cat("-------------------------------------------------------------------\n\n", sep = "")
+cat("Data Definitions\n","________________\n", sep = "")
+print(code.book.dtTidyAvg.columnDefs)
+cat("\n\n\n")
+print(code.book.dtTidyAvg)
 
 

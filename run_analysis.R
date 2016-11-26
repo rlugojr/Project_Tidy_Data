@@ -1,3 +1,4 @@
+#Tidy data processing script
 #Project Tidy Data - run_analysis.R
 #Getting and Cleaning Data
 #by Ray Lugo, Jr.
@@ -81,7 +82,7 @@ for (loadfile in loadfiles) {
 }
 
 #free up memory by removing unecessary objects
-#rm("url","sourceFile","datafiles","loadfiles","loadfile","tblname")
+rm("url","sourceFile","datafiles","loadfiles","loadfile","tblname")
 
 print("adding column names.")
 #get column names from headers table
@@ -155,11 +156,24 @@ dtTidy <- dtAll %>%
            signal_type = ifelse(str_count(measurement, "Body") != 0, "body", "gravity"),
            sensor = ifelse(str_count(measurement, "Acc") != 0, "accelerometer", "gyroscope"),
            statistic = ifelse(str_count(measurement, "mean") != 0, "mean", "std_dev"),
-           jerk = ifelse(str_count(measurement, "Jerk") != 0, "TRUE", "FALSE"),
-           magnitude = ifelse(str_count(measurement, "Mag") != 0,"TRUE", "FALSE"),
+           jerk = ifelse(str_count(measurement, "Jerk") != 0, TRUE, FALSE),
+           magnitude = ifelse(str_count(measurement, "Mag") != 0,TRUE, FALSE),
            axis = ifelse(str_detect(str_sub(measurement, start = str_length(measurement)),c("X","Y","Z")), (str_sub(measurement, start = str_length(measurement))), NA)) %>%
     dplyr::select(subjectID,activityName,domain,signal_type, sensor, statistic, jerk, magnitude, axis, value) %>%
     arrange(subjectID,activityName,domain,signal_type, sensor, statistic, jerk, magnitude, axis, value)
+
+print("creating factors.")
+#create levels for variables
+dtTidy$subjectID <- as.factor(dtTidy$subjectID)
+dtTidy$activityName <- as.factor(dtTidy$activityName)
+dtTidy$domain <- as.factor(dtTidy$domain)
+dtTidy$signal_type <- as.factor(dtTidy$signal_type)
+dtTidy$sensor <- as.factor(dtTidy$sensor)
+dtTidy$statistic <- as.factor(dtTidy$statistic)
+dtTidy$jerk <- as.factor(dtTidy$jerk)
+dtTidy$magnitude <- as.factor(dtTidy$magnitude)
+dtTidy$axis <- as.factor(dtTidy$axis)
+
 #display first tidy data.table.
 print("here is a glimpse of dtTidy")
 glimpse(dtTidy)
@@ -188,11 +202,11 @@ ifelse(count(dtMatch) == count(dtTidy),print("results validated!"),print("Did no
 rm("dtMatch")
 
 #write CSV files for each table to the "./data" folder.
-#Uncomment next 3 lines to export the data to files.
-#print("writing datasets to csv files in './data' folder.")
-#write.csv(dtTidy, "./data/tidy.csv", na = "NA")
-write.table(dtTidyAvg, "./data/UCI_Analysis_Tidy_Data.txt", quote = FALSE, na = "NA")
-print(paste0("data table exported to ", getwd(),"/data/UCI_Analysis_Tidy_Data.txt"))
+print("writing datasets to csv files in './data' folder.")
+#Uncomment next line to export the first Tidy dataset to file.
+#write.csv(dtTidy, "./data/UCI_Analysis_Tidy.csv", na = "NA")
+write.table(dtTidyAvg, "./data/UCI_Analysis_Summary_Tidy.txt", quote = FALSE, na = "NA")
+print(paste0("data table exported to ", getwd(),"/data/UCI_Analysis_Summary_Tidy.txt"))
 
 print(paste("processing completed at :", Sys.time()))
 
