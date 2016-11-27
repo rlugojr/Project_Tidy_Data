@@ -7,16 +7,15 @@ output:
     toc: yes
     toc_depth: 5
     variant: markdown_github
-  html_document:
-    toc: yes
-    toc_depth: 5
-    toc_float: yes
+
 ---
 ------
 
-https://github.com/rlugojr/Project_Tidy_Data
 
 ### Project Overview
+
+https://github.com/rlugojr/Project_Tidy_Data
+
 #### Purpose
 
 The purpose of this project is to demonstrate applied knowledge of the following:

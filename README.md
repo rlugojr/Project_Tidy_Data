@@ -1,3 +1,8 @@
+-   [Project Overview](#project-overview)
+    -   [Purpose](#purpose)
+    -   [Reproducing Results](#reproducing-results)
+    -   [Instructions](#instructions)
+    -   [More Info](#more-info)
 -   [Original Experiment](#original-experiment)
     -   [Human Activity Recognition using Smartphones](#human-activity-recognition-using-smartphones)
     -   [Data Collection Process](#data-collection-process)
@@ -14,49 +19,53 @@
 -   [Citations](#citations)
 -   [Attributions](#attributions)
 
-<table style="width:8%;">
-<colgroup>
-<col width="8%" />
-</colgroup>
-<tbody>
-<tr class="odd">
-<td><a href="https://github.com/rlugojr/Project_Tidy_Data" class="uri">https://github.com/rlugojr/Project_Tidy_Data</a></td>
-</tr>
-<tr class="even">
-<td>### Project Overview #### Purpose</td>
-</tr>
-<tr class="odd">
-<td>The purpose of this project is to demonstrate applied knowledge of the following:</td>
-</tr>
-<tr class="even">
-<td>1. Retrieve and load a dataset provided by another analyst or team using R. 2. Understand the overall experiment and associated metadata documents in order to design and develop an accurate method for processing the observational data. The ability to gain sufficient knowledge is essential to successful preparation of data in an optimal format and structure for analysis and reporting. 3. Process the data, using the information provided and insight gained, according to the principles of &quot;tidy&quot; datasets. 4. Run validation tests to ensure that the newly processed dataset maintained its integrity through comparison of key meta-statistics with the original dataset. 5. Assure quality of processed data by confirming that no additional data was created or observations omitted, and that the original values were in no way corrupted, modified or lost during conversion. 5. Document all steps, functions and scripts used. 6. Create a Codebook that documents the data processing code and workflow, all variable and value metadata, high level statistics and sample data from the resulting dataset, along with version numbers of any 3rd part software used. 7. Publish the documentation and &quot;tidy&quot; dataset in a format that is easily accessible and ready for analyis.</td>
-</tr>
-<tr class="odd">
-<td>#### Reproducing Results</td>
-</tr>
-<tr class="even">
-<td>The R Script files contained in this repository were designed with the following assumptions:</td>
-</tr>
-<tr class="odd">
-<td>1. The computer you will be using has an active Internet connection. 2. RStudio (preferrably) will be used to run the script files. 3. The required libraries installed and\or loaded. 4. The data achive for the project has not been downloaded. 5. You have set your preferred working directory before running any scripts. 6. The scripts are run in a new session or current session is saved (<strong>IMPORTANT!!! The script run_analyis.R will remove all objects from memory before running! This was meant to ensure that the environment was free of clutter and that no prior versions of the intermediate tables were present in memory. Each run will execute rm(list=ls()) so remove or comment out that line if you do not want this type of behavior from a script!!!</strong>)</td>
-</tr>
-<tr class="even">
-<td>The scripts have been programmed to create a sub-directory named &quot;data&quot;, then download the data ZIP archive and also check the list of package dependencies to install any that may be missing. Once all necessary packages are installed and loaded, data processing will execute and then the codebook is generated. These scripts can be run multiple times since they will not redownload any already available dependencies and data file but will clear the environment and overwrite or replace output files as needed.</td>
-</tr>
-<tr class="odd">
-<td>#### Instructions</td>
-</tr>
-<tr class="even">
-<td><code>1. Clone the repository or download the files into a folder. 2. In R, &quot;setwd()&quot; to the folder containing the repo files. 3. From the R CLI, run &quot;make.R&quot;. 4. Take a deep breathe and exhale on a 5-count. 5. Data processing should be complete. *Files are ready in about 10 seconds, depending on your wrangling rig and Internet connection speed.</code></td>
-</tr>
-<tr class="odd">
-<td>#### More Info</td>
-</tr>
-<tr class="even">
-<td>Continue reading from here to learn about the experiment that generated this dataset or skip to the &quot;Data Preparation&quot; section to get a high level overview of the data preparation methods and results.</td>
-</tr>
-</tbody>
-</table>
+------------------------------------------------------------------------
+
+### Project Overview
+
+<https://github.com/rlugojr/Project_Tidy_Data>
+
+#### Purpose
+
+The purpose of this project is to demonstrate applied knowledge of the following:
+
+1.  Retrieve and load a dataset provided by another analyst or team using R.
+2.  Understand the overall experiment and associated metadata documents in order to design and develop an accurate method for processing the observational data. The ability to gain sufficient knowledge is essential to successful preparation of data in an optimal format and structure for analysis and reporting.
+3.  Process the data, using the information provided and insight gained, according to the principles of "tidy" datasets.
+4.  Run validation tests to ensure that the newly processed dataset maintained its integrity through comparison of key meta-statistics with the original dataset.
+5.  Assure quality of processed data by confirming that no additional data was created or observations omitted, and that the original values were in no way corrupted, modified or lost during conversion.
+6.  Document all steps, functions and scripts used.
+7.  Create a Codebook that documents the data processing code and workflow, all variable and value metadata, high level statistics and sample data from the resulting dataset, along with version numbers of any 3rd part software used.
+8.  Publish the documentation and "tidy" dataset in a format that is easily accessible and ready for analyis.
+
+#### Reproducing Results
+
+The R Script files contained in this repository were designed with the following assumptions:
+
+1.  The computer you will be using has an active Internet connection.
+2.  RStudio (preferrably) will be used to run the script files.
+3.  The required libraries installed and\\or loaded.
+4.  The data achive for the project has not been downloaded.
+5.  You have set your preferred working directory before running any scripts.
+6.  The scripts are run in a new session or current session is saved
+    (**IMPORTANT!!! The script run\_analyis.R will remove all objects from memory before running! This was meant to ensure that the environment was free of clutter and that no prior versions of the intermediate tables were present in memory. Each run will execute rm(list=ls()) so remove or comment out that line if you do not want this type of behavior from a script!!!**)
+
+The scripts have been programmed to create a sub-directory named "data", then download the data ZIP archive and also check the list of package dependencies to install any that may be missing. Once all necessary packages are installed and loaded, data processing will execute and then the codebook is generated. These scripts can be run multiple times since they will not redownload any already available dependencies and data file but will clear the environment and overwrite or replace output files as needed.
+
+#### Instructions
+
+    1. Clone the repository or download the files into a folder.
+    2. In R, "setwd()" to the folder containing the repo files.  
+    3. From the R CLI, run "make.R".
+    4. Take a deep breathe and exhale on a 5-count.
+    5. Data processing should be complete. 
+    *Files are ready in about 10 seconds, depending on your wrangling rig and Internet connection speed.
+
+#### More Info
+
+Continue reading from here to learn about the experiment that generated this dataset or skip to the "Data Preparation" section to get a high level overview of the data preparation methods and results.
+
+------------------------------------------------------------------------
 
 ### Original Experiment
 
