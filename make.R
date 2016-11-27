@@ -10,5 +10,5 @@ library(rmarkdown)
 library(knitr)
 
 render("README.Rmd")
-#render("run_analysis.Rmd")
+render("run_analysis.Rmd")
 #render("codebook.Rmd")

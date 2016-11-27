@@ -1,34 +1,303 @@
 ---
 title: "Project Tidy Data - run_analysis.R template"
 author: "Ray Lugo, Jr."
-date: Sys.Date()
+date: "November 25, 2016"
 output:
-  html_document:
-    keep_md: yes
+  md_document:
+    toc: yes
+    toc_depth: 5
+    variant: markdown_github
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+## run_analysis.R - Tidy data processing script
+
+The purpose of "run_analysis.R" is to:  
+1. Create a 'tidy' data table from the "train"" and "test"" sets.  
+2. Use descriptive activity names to name the activities in the data set.  
+3. Appropriately labels the data set with descriptive variable names.  
+4. Extract only the measurements on the mean and standard deviation for each measurement.  
+5. Using the 'tidy' data set, creates a second tidy data set which summarizes the tidy table, providing the mean value on the aggregated rows for each valid combination of variables, activity and subject.  
+
+------
+
+### ___*Script Begins*___
+
+
+#### Prepare the environment
+
+1. Clear workspace of prior objects to free memory.
+```
+rm(list = ls())
 ```
 
-## GitHub Documents
-
-This is an R Markdown format used for publishing markdown documents to GitHub. When you click the **Knit** button all R code chunks are run and a markdown file (.md) suitable for publishing to GitHub is generated.
-
-## Including Code
-
-You can include R code in the document as follows:
-
-```{r cars}
-summary(cars)
+2. Function to install and load libraries that are not already installed or loaded using very cool approach found here https://gist.github.com/stevenworthington/3178163
+```
+ipak <- function(pkg){
+    new.pkg <- pkg[!(pkg %in% installed.packages()[, "Package"])]
+    if (length(new.pkg))
+        install.packages(new.pkg, dependencies = TRUE)
+    sapply(pkg, require, character.only = TRUE)
+}
+print(paste("started at :", Sys.time()))
 ```
 
-## Including Plots
-
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
+3. Create vector of libraries and pass into the above function.
+```
+print("loading libraries.")
+libraries <- c("data.table","dtplyr","dplyr","readr","stringr", "psych", "reshape2")
+ipak(libraries)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+4. Remove the objects since they will not be used again this session
+```
+rm("libraries","ipak")
+```
+
+#### Retrieve unprocessed data.
+
+5. Check for data folder.  create one if none exists.
+```
+if (!file.exists("./data")) { dir.create("./data")}
+```
+
+6. Get "UCI data" archive by using libcurl, which allows for OS independence. set the url value.
+```
+url <- "https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip"
+```
+
+7. Create a sourcefile variable for reference when downloading and unzipping
+```
+sourceFile <- "./data/uci.zip"
+```
+
+8. Check if file has already been downloaded.  If it does not exist, then download it.
+```
+print("downloading data archive.")
+
+if (!file.exists(sourceFile)) {
+    download.file(url, destfile = "./data/uci.zip", method = "libcurl")
+}
+```
+
+
+#### Load specific data files into respective data tables.
+
+9. Create a vector with the exact files needed for data processing
+```
+datafiles <- c("UCI HAR Dataset/features.txt","UCI HAR Dataset/activity_labels.txt",
+               "UCI HAR Dataset/test/subject_test.txt","UCI HAR Dataset/test/X_test.txt","UCI HAR Dataset/test/y_test.txt",
+               "UCI HAR Dataset/train/subject_train.txt","UCI HAR Dataset/train/X_train.txt","UCI HAR Dataset/train/y_train.txt")
+
+print("unzipping data files")
+```
+
+10. Using "unzip", extract only those file.  using "jumkpaths" removes any internal folder structure to allow all files to be placed as designated, in this case, all in the root of the "./data" folder.
+```
+unzip(sourceFile, datafiles, list = FALSE, junkpaths = TRUE, exdir = "./data", unzip = "internal")
+```
+
+11. Use "gsub" with a simple regex to get loadfile names for the extracted files from the original vector, so that we know which files should be available
+```
+loadfiles <- gsub("UCI HAR Dataset/(test/|train/)?","",datafiles)
+
+print("loading files into data tables.")
+```
+
+12. Load each file into its own table which is named dynamically using the file's name (sans extension)
+```
+for (loadfile in loadfiles) {
+    if (loadfile == "features.txt") {
+        #handle the "features" table separately for use as the header of specific tables
+        tblHeader <- read.delim(paste0("./data/",loadfile), header = FALSE, sep = " ", stringsAsFactors = FALSE, col.names = c("num","name"))
+    } else {
+        #load table into data.table using file name as the table name.
+        tblname <- tolower(gsub(".txt","",loadfile))
+        assign(tblname, fread(paste0("./data/",loadfile), header = FALSE))
+    }
+    #update user on progress.
+    print(paste("table",tolower(gsub(".txt","",loadfile)),"has been loaded."))
+}
+```
+
+13. Free up memory by removing unecessary objects
+```
+rm("url","sourceFile","datafiles","loadfiles","loadfile","tblname")
+```
+
+#### Add meaningful column names
+
+14. Get column names from headers table
+```
+print("adding column names.")
+allColNames <- tblHeader$name
+```
+
+15. Add column names to the "x" tables using headers from "features" file which is stored in the table "tblHeader"
+```
+colnames(x_test) <- allColNames
+colnames(x_train) <- allColNames
+```
+
+16. Assign meaningful column names to "y" tables
+```
+colnames(y_test) <- "activityID"
+colnames(y_train) <- "activityID"
+```
+
+17. Assign meaningful column names to "subject" tables
+```
+colnames(subject_test) <- "subjectID"
+colnames(subject_train) <- "subjectID"
+```
+
+18. Assign meaningful column names to activity_labels
+```
+colnames(activity_labels)<-c("activityID", "activityName")
+```
+
+19. Lowercase activityName values for consistency
+```
+activity_labels$activityName <- tolower(activity_labels$activityName)
+```
+
+#### CBIND and RBIND to create "master" data table.
+
+20. Isolate names of columns to keep. Using "grep" and a simple regex that identifies "mean" or "std"
+```
+keepCols <- grep("(mean[^F]|std)",names(x_test))
+
+print("creating tables for processing")
+```
+
+21. Create new tables using subset of columns from "x" tables, keeping only the identified column names.
+```
+x_test_keep <- dplyr::select(x_test, keepCols)
+x_train_keep <- dplyr::select(x_train, keepCols)
+```
+
+22. Free up memory by removing unecessary objects
+```
+rm("tblHeader","x_test","x_train")
+```
+
+23. Create single data.table for each type of dataset using cbin, one for "test" data and another for "train" data.
+```
+print("combining tables")
+
+testData <- cbind(subject_test, x_test_keep)
+testData <- cbind(testData, y_test)
+trainData <- cbind(subject_train, x_train_keep)
+trainData <- cbind(trainData, y_train)
+```
+
+24. Concat rows from both tables into one table in order to process the data all at once since it is small enough to fit into memory.
+```
+dtTemp <- rbind(testData, trainData)
+```
+
+#### Add meaningful activity names to associated observations through join by activityID
+
+25. Join main table with the "activity_labels" table to associate the corresponding "activityName" values
+```
+dtTemp <- inner_join(dtTemp, activity_labels, by = "activityID" )
+```
+
+26. Create new data.table from temp table
+```
+dtAll <- tbl_df(dtTemp)
+```
+
+27. Free up memory by removing unecessary objects
+```
+rm("subject_test","subject_train","testData","trainData","x_test_keep","x_train_keep","y_test","y_train", "dtTemp", "activity_labels")
+```
+
+#### Create first level *tidy* dataset
+
+28. create tidy dataset by rearranging columns and normalizing the dataset. Store names of columns that will not need to be reshaped in a vector. Pivot remaining columns to make a row per obeservation using reshape2::melt(). Use dplyr::mutate() to create new columns with values generated from the current "measurement" value. Select and arrange the columns into a new table, leaving out the "activityID" field
+```
+print("creating first tidy dataset.")
+
+colID <- c("activityID","subjectID","activityName")
+dtTidy <- dtAll %>%
+    melt(id = colID, variable.name = "measurement") %>%
+    dplyr::select(-activityID) %>%
+    mutate(domain = ifelse(str_sub(measurement, start = 1, end = 1) == "t", "time","frequency"),
+           signal_type = ifelse(str_count(measurement, "Body") != 0, "body", "gravity"),
+           sensor = ifelse(str_count(measurement, "Acc") != 0, "accelerometer", "gyroscope"),
+           statistic = ifelse(str_count(measurement, "mean") != 0, "mean", "stdDev"),
+           jerk = ifelse(str_count(measurement, "Jerk") != 0, TRUE, FALSE),
+           magnitude = ifelse(str_count(measurement, "Mag") != 0,TRUE, FALSE),
+           axis = ifelse(str_detect(str_sub(measurement, start = str_length(measurement)),c("X","Y","Z")), (str_sub(measurement, start = str_length(measurement))), NA)) %>%
+    dplyr::select(subjectID,activityName,domain,signal_type, sensor, statistic, jerk, magnitude, axis, value) %>%
+    arrange(subjectID,activityName,domain,signal_type, sensor, statistic, jerk, magnitude, axis, value)
+```
+
+29.Create levels for variables
+```
+print("creating factors.")
+
+dtTidy$subjectID <- as.factor(dtTidy$subjectID)
+dtTidy$activityName <- as.factor(dtTidy$activityName)
+dtTidy$domain <- as.factor(dtTidy$domain)
+dtTidy$signal_type <- as.factor(dtTidy$signal_type)
+dtTidy$sensor <- as.factor(dtTidy$sensor)
+dtTidy$statistic <- as.factor(dtTidy$statistic)
+dtTidy$jerk <- as.factor(dtTidy$jerk)
+dtTidy$magnitude <- as.factor(dtTidy$magnitude)
+dtTidy$axis <- as.factor(dtTidy$axis)
+```
+
+30. Display first tidy data.table.
+```
+print("here is a glimpse of dtTidy")
+glimpse(dtTidy)
+```
+
+31. Free up memory by removing unecessary objects
+```
+rm("dtAll", "colID", "allColNames", "keepCols")
+```
+
+#### Create Summarized *tidy* dataset (deliverable)
+
+32. create summarized tidy dataset. Use dplyr::group_by to specify columns used for grouping by value. Use dplyr::summarize() to specify aggregation method on value column. Arrange the resulting set so that variable columns are listed before the aggregated value column, from left to right.
+```
+print("creating second tidy dataset.")
+
+dtTidyAvg <- dtTidy %>%
+    group_by(subjectID, activityName, domain, signal_type, sensor, statistic, jerk, magnitude, axis) %>%
+    summarize(obs = n(),average = mean(value)) %>%
+    arrange(subjectID, activityName, domain, signal_type, sensor, statistic, jerk, magnitude, axis, average)
+```
+
+33. Display second tidy data.table.
+```
+print("here is a glimpse of dtTidyAvg")
+glimpse(dtTidyAvg)
+```
+
+#### Validate records by joining both processed tables and verifying row counts match.
+
+34. Validate resulting tables by joining and comparing count of rows
+```
+dtMatch <- inner_join(dtTidy,dtTidyAvg)
+ifelse(count(dtMatch) == count(dtTidy),print("results validated!"),print("Did not pass validation.  Check script and data."))
+rm("dtMatch")
+```
+
+#### Write dataset to tab delimited text file.
+
+
+35. Write CSV files for each table to the "./data" folder.
+```
+print("writing datasets to csv files in './data' folder.")
+#Uncomment next line to export the first Tidy dataset to file.
+#write.csv(dtTidy, "./data/UCI_Analysis_Tidy.csv", na = "NA")
+write.table(dtTidyAvg, "./data/UCI_Analysis_Summary_Tidy.txt", quote = FALSE, na = "NA")
+print(paste0("data table exported to ", getwd(),"/data/UCI_Analysis_Summary_Tidy.txt"))
+
+print(paste("processing completed at :", Sys.time()))
+```
+
+### ___*Script Ends*___
