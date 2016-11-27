@@ -118,7 +118,7 @@ $(document).ready(function () {
 
 <h1 class="title toc-ignore">run_analysis.R</h1>
 <h4 class="author"><em>rlugojr</em></h4>
-<h4 class="date"><em>Thu Nov 24 03:57:26 2016</em></h4>
+<h4 class="date"><em>Fri Nov 25 01:07:06 2016</em></h4>
 
 </div>
 
@@ -135,7 +135,7 @@ ipak &lt;- function(pkg){
     sapply(pkg, require, character.only = TRUE)
 }
 print(paste(&quot;started at :&quot;, Sys.time()))</code></pre>
-<pre><code>## [1] &quot;started at : 2016-11-24 03:57:26&quot;</code></pre>
+<pre><code>## [1] &quot;started at : 2016-11-25 01:07:06&quot;</code></pre>
 <pre class="r"><code>print(&quot;loading libraries.&quot;)</code></pre>
 <pre><code>## [1] &quot;loading libraries.&quot;</code></pre>
 <pre class="r"><code>#create vector of libraries and pass into the above function.
@@ -209,19 +209,28 @@ loadfiles &lt;- gsub(&quot;UCI HAR Dataset/(test/|train/)?&quot;,&quot;&quot;,da
 print(&quot;loading files into data tables.&quot;)</code></pre>
 <pre><code>## [1] &quot;loading files into data tables.&quot;</code></pre>
 <pre class="r"><code>#load each file into its own table which is named dynamically using the file's name (sans extension)
-#handle the &quot;features&quot; table separately for use as the header of specific tables
 for (loadfile in loadfiles) {
     if (loadfile == &quot;features.txt&quot;) {
+        #handle the &quot;features&quot; table separately for use as the header of specific tables
         tblHeader &lt;- read.delim(paste0(&quot;./data/&quot;,loadfile), header = FALSE, sep = &quot; &quot;, stringsAsFactors = FALSE, col.names = c(&quot;num&quot;,&quot;name&quot;))
     } else {
-
+        #load table into data.table using file name as the table name.
         tblname &lt;- tolower(gsub(&quot;.txt&quot;,&quot;&quot;,loadfile))
         assign(tblname, fread(paste0(&quot;./data/&quot;,loadfile), header = FALSE))
     }
-}
-
-#free up memory by removing unecessary objects
-rm(&quot;url&quot;,&quot;sourceFile&quot;,&quot;datafiles&quot;,&quot;loadfiles&quot;,&quot;loadfile&quot;,&quot;tblname&quot;)
+    #update user on progress.
+    print(paste(&quot;table&quot;,tolower(gsub(&quot;.txt&quot;,&quot;&quot;,loadfile)),&quot;has been loaded.&quot;))
+}</code></pre>
+<pre><code>## [1] &quot;table features has been loaded.&quot;
+## [1] &quot;table activity_labels has been loaded.&quot;
+## [1] &quot;table subject_test has been loaded.&quot;
+## [1] &quot;table x_test has been loaded.&quot;
+## [1] &quot;table y_test has been loaded.&quot;
+## [1] &quot;table subject_train has been loaded.&quot;
+## [1] &quot;table x_train has been loaded.&quot;
+## [1] &quot;table y_train has been loaded.&quot;</code></pre>
+<pre class="r"><code>#free up memory by removing unecessary objects
+#rm(&quot;url&quot;,&quot;sourceFile&quot;,&quot;datafiles&quot;,&quot;loadfiles&quot;,&quot;loadfile&quot;,&quot;tblname&quot;)
 
 print(&quot;adding column names.&quot;)</code></pre>
 <pre><code>## [1] &quot;adding column names.&quot;</code></pre>
@@ -249,14 +258,14 @@ activity_labels$activityName &lt;- tolower(activity_labels$activityName)
 
 #isolate names of columns to keep.
 #using &quot;grep&quot; and a simple regex that identifies &quot;mean&quot; or &quot;std&quot;
-keepCols &lt;- x_test[,grep(&quot;(mean[^F]|std)&quot;,names(x_test))]
+keepCols &lt;- grep(&quot;(mean[^F]|std)&quot;,names(x_test))
 
 print(&quot;creating tables for processing&quot;)</code></pre>
 <pre><code>## [1] &quot;creating tables for processing&quot;</code></pre>
 <pre class="r"><code>#create new tables using subset of columns from &quot;x&quot; tables
 #keeping only the identified column names.
-x_test_keep &lt;- select(x_test, keepCols)
-x_train_keep &lt;- select(x_train, keepCols)
+x_test_keep &lt;- dplyr::select(x_test, keepCols)
+x_train_keep &lt;- dplyr::select(x_train, keepCols)
 
 #free up memory by removing unecessary objects
 rm(&quot;tblHeader&quot;,&quot;x_test&quot;,&quot;x_train&quot;)
@@ -294,18 +303,33 @@ print(&quot;creating first tidy dataset.&quot;)</code></pre>
 colID &lt;- c(&quot;activityID&quot;,&quot;subjectID&quot;,&quot;activityName&quot;)
 dtTidy &lt;- dtAll %&gt;%
     melt(id = colID, variable.name = &quot;measurement&quot;) %&gt;%
-    select(-activityID) %&gt;%
+    dplyr::select(-activityID) %&gt;%
     mutate(domain = ifelse(str_sub(measurement, start = 1, end = 1) == &quot;t&quot;, &quot;time&quot;,&quot;frequency&quot;),
-           signal_component = ifelse(str_count(measurement, &quot;Body&quot;) != 0, &quot;body&quot;, &quot;gravity&quot;),
+           signal_type = ifelse(str_count(measurement, &quot;Body&quot;) != 0, &quot;body&quot;, &quot;gravity&quot;),
            sensor = ifelse(str_count(measurement, &quot;Acc&quot;) != 0, &quot;accelerometer&quot;, &quot;gyroscope&quot;),
-           statistic = ifelse(str_count(measurement, &quot;mean&quot;) != 0, &quot;mean&quot;, &quot;standard_deviation&quot;),
+           statistic = ifelse(str_count(measurement, &quot;mean&quot;) != 0, &quot;mean&quot;, &quot;std_dev&quot;),
            jerk = ifelse(str_count(measurement, &quot;Jerk&quot;) != 0, &quot;TRUE&quot;, &quot;FALSE&quot;),
            magnitude = ifelse(str_count(measurement, &quot;Mag&quot;) != 0,&quot;TRUE&quot;, &quot;FALSE&quot;),
            axis = ifelse(str_detect(str_sub(measurement, start = str_length(measurement)),c(&quot;X&quot;,&quot;Y&quot;,&quot;Z&quot;)), (str_sub(measurement, start = str_length(measurement))), NA)) %&gt;%
-    select(subjectID,activityName,domain,signal_component, sensor, statistic, jerk, magnitude, axis, value) %&gt;%
-    arrange(subjectID,activityName,domain,signal_component, sensor, statistic, jerk, magnitude, axis, value)
-
-#free up memory by removing unecessary objects
+    dplyr::select(subjectID,activityName,domain,signal_type, sensor, statistic, jerk, magnitude, axis, value) %&gt;%
+    arrange(subjectID,activityName,domain,signal_type, sensor, statistic, jerk, magnitude, axis, value)
+#display first tidy data.table.
+print(&quot;here is a glimpse of dtTidy&quot;)</code></pre>
+<pre><code>## [1] &quot;here is a glimpse of dtTidy&quot;</code></pre>
+<pre class="r"><code>glimpse(dtTidy)</code></pre>
+<pre><code>## Observations: 679,734
+## Variables: 10
+## $ subjectID    &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...
+## $ activityName &lt;chr&gt; &quot;laying&quot;, &quot;laying&quot;, &quot;laying&quot;, &quot;laying&quot;, &quot;laying&quot;,...
+## $ domain       &lt;chr&gt; &quot;frequency&quot;, &quot;frequency&quot;, &quot;frequency&quot;, &quot;frequency...
+## $ signal_type  &lt;chr&gt; &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;...
+## $ sensor       &lt;chr&gt; &quot;accelerometer&quot;, &quot;accelerometer&quot;, &quot;accelerometer&quot;...
+## $ statistic    &lt;chr&gt; &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;...
+## $ jerk         &lt;chr&gt; &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FAL...
+## $ magnitude    &lt;chr&gt; &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FAL...
+## $ axis         &lt;chr&gt; &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;,...
+## $ value        &lt;dbl&gt; -0.9957499, -0.9947444, -0.9940373, -0.9937242, -...</code></pre>
+<pre class="r"><code>#free up memory by removing unecessary objects
 rm(&quot;dtAll&quot;, &quot;colID&quot;, &quot;allColNames&quot;, &quot;keepCols&quot;)
 
 print(&quot;creating second tidy dataset.&quot;)</code></pre>
@@ -316,54 +340,45 @@ print(&quot;creating second tidy dataset.&quot;)</code></pre>
 #arrange the resulting set so that variable columns are listed before the
 #aggregated value column, from left to right.
 dtTidyAvg &lt;- dtTidy %&gt;%
-    group_by(subjectID, activityName, domain, signal_component, sensor, statistic, jerk, magnitude, axis) %&gt;%
-    summarize(average = mean(value)) %&gt;%
-    arrange(subjectID, activityName, domain, signal_component, sensor, statistic, jerk, magnitude, axis, average)
+    group_by(subjectID, activityName, domain, signal_type, sensor, statistic, jerk, magnitude, axis) %&gt;%
+    summarize(obs = n(),average = mean(value)) %&gt;%
+    arrange(subjectID, activityName, domain, signal_type, sensor, statistic, jerk, magnitude, axis, average)
+
+#display second tidy data.table.
+print(&quot;here is a glimpse of dtTidyAvg&quot;)</code></pre>
+<pre><code>## [1] &quot;here is a glimpse of dtTidyAvg&quot;</code></pre>
+<pre class="r"><code>glimpse(dtTidyAvg)</code></pre>
+<pre><code>## Observations: 14,760
+## Variables: 11
+## $ subjectID    &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1...
+## $ activityName &lt;chr&gt; &quot;laying&quot;, &quot;laying&quot;, &quot;laying&quot;, &quot;laying&quot;, &quot;laying&quot;,...
+## $ domain       &lt;chr&gt; &quot;frequency&quot;, &quot;frequency&quot;, &quot;frequency&quot;, &quot;frequency...
+## $ signal_type  &lt;chr&gt; &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;...
+## $ sensor       &lt;chr&gt; &quot;accelerometer&quot;, &quot;accelerometer&quot;, &quot;accelerometer&quot;...
+## $ statistic    &lt;chr&gt; &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;...
+## $ jerk         &lt;chr&gt; &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;TRU...
+## $ magnitude    &lt;chr&gt; &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;TRUE&quot;, &quot;FALS...
+## $ axis         &lt;chr&gt; &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot;, NA, NA, &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot;, NA, NA, &quot;X&quot;...
+## $ obs          &lt;int&gt; 17, 17, 16, 100, 50, 17, 17, 16, 100, 50, 17, 17,...
+## $ average      &lt;dbl&gt; -0.9393346, -0.8368175, -0.9164070, -0.8958446, -...</code></pre>
+<pre class="r"><code>#Validate resulting tables by joining and comparing count of rows
+dtMatch &lt;- inner_join(dtTidy,dtTidyAvg)</code></pre>
+<pre><code>## Joining, by = c(&quot;subjectID&quot;, &quot;activityName&quot;, &quot;domain&quot;, &quot;signal_type&quot;, &quot;sensor&quot;, &quot;statistic&quot;, &quot;jerk&quot;, &quot;magnitude&quot;, &quot;axis&quot;)</code></pre>
+<pre class="r"><code>ifelse(count(dtMatch) == count(dtTidy),print(&quot;results validated!&quot;),print(&quot;Did not pass validation.  Check script and data.&quot;))</code></pre>
+<pre><code>## [1] &quot;results validated!&quot;</code></pre>
+<pre><code>##      n                   
+## [1,] &quot;results validated!&quot;</code></pre>
+<pre class="r"><code>rm(&quot;dtMatch&quot;)
 
 #write CSV files for each table to the &quot;./data&quot; folder.
 #Uncomment next 3 lines to export the data to files.
 #print(&quot;writing datasets to csv files in './data' folder.&quot;)
 #write.csv(dtTidy, &quot;./data/tidy.csv&quot;, na = &quot;NA&quot;)
 write.csv(dtTidyAvg, &quot;./data/tidyData.csv&quot;, na = &quot;NA&quot;)
-
-print(paste(&quot;processing completed at :&quot;, Sys.time()))</code></pre>
-<pre><code>## [1] &quot;processing completed at : 2016-11-24 03:57:36&quot;</code></pre>
-<pre class="r"><code>print(&quot;take a glimpse!&quot;)</code></pre>
-<pre><code>## [1] &quot;take a glimpse!&quot;</code></pre>
-<pre class="r"><code>#wait for the user to press &quot;return&quot;
-invisible(readline(prompt = &quot;Press &lt;Enter&gt; to continue...&quot;))</code></pre>
-<pre><code>## Press &lt;Enter&gt; to continue...</code></pre>
-<pre class="r"><code>#use glimpse() on both tables for user review of tables
-print(&quot;dtTidy&quot;)</code></pre>
-<pre><code>## [1] &quot;dtTidy&quot;</code></pre>
-<pre class="r"><code>glimpse(dtTidy)</code></pre>
-<pre><code>## Observations: 679,734
-## Variables: 10
-## $ subjectID        &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
-## $ activityName     &lt;chr&gt; &quot;laying&quot;, &quot;laying&quot;, &quot;laying&quot;, &quot;laying&quot;, &quot;layi...
-## $ domain           &lt;chr&gt; &quot;frequency&quot;, &quot;frequency&quot;, &quot;frequency&quot;, &quot;frequ...
-## $ signal_component &lt;chr&gt; &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body...
-## $ sensor           &lt;chr&gt; &quot;accelerometer&quot;, &quot;accelerometer&quot;, &quot;accelerome...
-## $ statistic        &lt;chr&gt; &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean...
-## $ jerk             &lt;chr&gt; &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, ...
-## $ magnitude        &lt;chr&gt; &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, ...
-## $ axis             &lt;chr&gt; &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, &quot;X&quot;, ...
-## $ value            &lt;dbl&gt; -0.9957499, -0.9947444, -0.9940373, -0.993724...</code></pre>
-<pre class="r"><code>print(&quot;dtTidyAvg&quot;)</code></pre>
-<pre><code>## [1] &quot;dtTidyAvg&quot;</code></pre>
-<pre class="r"><code>glimpse(dtTidyAvg)</code></pre>
-<pre><code>## Observations: 14,760
-## Variables: 10
-## $ subjectID        &lt;int&gt; 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, ...
-## $ activityName     &lt;chr&gt; &quot;laying&quot;, &quot;laying&quot;, &quot;laying&quot;, &quot;laying&quot;, &quot;layi...
-## $ domain           &lt;chr&gt; &quot;frequency&quot;, &quot;frequency&quot;, &quot;frequency&quot;, &quot;frequ...
-## $ signal_component &lt;chr&gt; &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body&quot;, &quot;body...
-## $ sensor           &lt;chr&gt; &quot;accelerometer&quot;, &quot;accelerometer&quot;, &quot;accelerome...
-## $ statistic        &lt;chr&gt; &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean&quot;, &quot;mean...
-## $ jerk             &lt;chr&gt; &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, ...
-## $ magnitude        &lt;chr&gt; &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;FALSE&quot;, &quot;TRUE&quot;, &quot;...
-## $ axis             &lt;chr&gt; &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot;, NA, NA, &quot;X&quot;, &quot;Y&quot;, &quot;Z&quot;, NA, NA,...
-## $ average          &lt;dbl&gt; -0.9393346, -0.8368175, -0.9164070, -0.895844...</code></pre>
+print(paste0(&quot;data table exported to&quot;, getwd(),&quot;/data/tidyData.csv&quot;))</code></pre>
+<pre><code>## [1] &quot;data table exported toD:/Data/Documents/GitHub/Project_Tidy_Data/data/tidyData.csv&quot;</code></pre>
+<pre class="r"><code>print(paste(&quot;processing completed at :&quot;, Sys.time()))</code></pre>
+<pre><code>## [1] &quot;processing completed at : 2016-11-25 01:07:19&quot;</code></pre>
 
 
 

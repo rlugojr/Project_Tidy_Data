@@ -30,7 +30,7 @@ print(paste("started at :", Sys.time()))
 
 print("loading libraries.")
 #create vector of libraries and pass into the above function.
-libraries <- c("data.table","dtplyr","dplyr","readr","stringr", "tidyr", "reshape2")
+libraries <- c("data.table","dtplyr","dplyr","readr","stringr", "psych", "reshape2")
 ipak(libraries)
 
 #remove the objects since they will not be used again this session
@@ -155,7 +155,7 @@ dtTidy <- dtAll %>%
     mutate(domain = ifelse(str_sub(measurement, start = 1, end = 1) == "t", "time","frequency"),
            signal_type = ifelse(str_count(measurement, "Body") != 0, "body", "gravity"),
            sensor = ifelse(str_count(measurement, "Acc") != 0, "accelerometer", "gyroscope"),
-           statistic = ifelse(str_count(measurement, "mean") != 0, "mean", "std_dev"),
+           statistic = ifelse(str_count(measurement, "mean") != 0, "mean", "stdDev"),
            jerk = ifelse(str_count(measurement, "Jerk") != 0, TRUE, FALSE),
            magnitude = ifelse(str_count(measurement, "Mag") != 0,TRUE, FALSE),
            axis = ifelse(str_detect(str_sub(measurement, start = str_length(measurement)),c("X","Y","Z")), (str_sub(measurement, start = str_length(measurement))), NA)) %>%
