@@ -29,6 +29,7 @@ The purpose of this project is to demonstrate applied knowledge of the following
 6. Create a Codebook that documents the data processing code and workflow, all variable and value metadata, high level statistics and sample data from the resulting dataset, along with version numbers of any 3rd part software used.  
 7. Publish the documentation and "tidy" dataset in a format that is easily accessible and ready for analyis.  
 
+
 #### Reproducing Results
 
 The R Script files contained in this repository were designed with the following assumptions:
@@ -66,6 +67,7 @@ Continue reading from here to learn about the experiment that generated this dat
 
 This experiment was designed to capture data from smartphone sensors in order to create a database which would allow for the automatic recognition of a smartphone user's  activities based upon a comparison of said user's device readings against the database of observed readings. Thirty volunteer subjects, aged 19 through 48 years of age, performed six activities (walking, walking_upstairs, walking_downstairs, sitting, standing and laying) while wearing a Samsung Galaxy II on their waists. Using the smartphone's embedded accelerometer and gyroscope, the scientists captured triaxial linear acceleration and triangular velocity at a constant rate of 50Hz.  
 
+
 #### Data Collection Process
 
 The sensor signals (accelerometer and gyroscope) were pre-processed by applying noise filters and then sampled in fixed-width sliding windows of 2.56 sec and 50% overlap (128 readings/window). The sensor acceleration signal, which has gravitational and body motion components, were separated using a Butterworth low-pass filter into body acceleration and gravity. The gravitational force is assumed to have only low frequency components, therefore a filter with 0.3 Hz cutoff frequency was used. From each window, a vector of features was obtained by calculating variables from the time and frequency domain.
@@ -82,6 +84,7 @@ Overall dataset is comprised of:
 * A unique identifier assigned to each of the experiment's participants (or subjects)
 
 The dataset used for this project can be retrieved here: [UCI Human Activity Recognition Dataset](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip)
+
 
 ------
 ###Data Preparation
@@ -101,6 +104,7 @@ test/X_test.txt         | Full Test set.
 test/y_test.txt         | Activity ID number associated with each observation (row)
 train/subject_train.txt | Each row identifies the partiipant who performed the activity for each observation. Range is from 1 to 30. 
 
+
 #### Loading
 
 1. Using R's base function "download.file" and the mode="libcurl" (for cross platform compatibility), the ZIP archive was downloaded to the "./data" directory.
@@ -108,6 +112,7 @@ https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Datas
 2. Created a vector to hold the ZIP filename (with internal path) for the files to load into tables.
 3. Used unzip() to extract only the files that were needed.
 4. With the help of a cool function found on Github (https://gist.github.com/stevenworthington/3178163), passed the filenames vector to the function and it created a data.table for each specified file, named after it's corresponding filename.
+
 
 #### Preparation
 
@@ -128,6 +133,12 @@ After visually inspecting the files and running a few functions for validation, 
 3. Created "tidy" data set by using a series of chained methods: select(), a series of mutate() commands to apply grep() statements to separate compund value in the measurements field into their own variables (columns) with meaningful names, another select() to limit columns and finally arrange() to set column and sort order.
 4. Created "tidyAvg" data set, using summzarize(),  group_by for aggregation and then arrange to set column and sort order.
 
+
+#### Tidy Data Codebook
+
+A codebook which documents the data processing steps and provides details on the metadata for the resulting dataset is available here: [Tidy Data Codebook](https://github.com/rlugojr/Project_Tidy_Data/blob/master/codebook.md)
+
+
 #### Tidy Data Set
 
 This is a glimpse of the first "tidy" data set:
@@ -144,9 +155,6 @@ This is a glimpse of the deliverable, summary "tidy" dataset:
 ```{r dtTidyAvg_head, echo=FALSE}
 headTail(dtTidyAvg,6,6)
 ```
-
-
-#### Tidy Data Codebook
 
 
 ### Relevant Papers:

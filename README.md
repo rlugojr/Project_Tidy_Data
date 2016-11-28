@@ -12,9 +12,9 @@
     -   [Loading](#loading)
     -   [Preparation](#preparation)
     -   [Transformation](#transformation)
+    -   [Tidy Data Codebook](#tidy-data-codebook)
     -   [Tidy Data Set](#tidy-data-set)
     -   [TidyAvg Data Set](#tidyavg-data-set)
-    -   [Tidy Data Codebook](#tidy-data-codebook)
 -   [Relevant Papers:](#relevant-papers)
 -   [Citations](#citations)
 -   [Attributions](#attributions)
@@ -161,6 +161,10 @@ After visually inspecting the files and running a few functions for validation, 
 3.  Created "tidy" data set by using a series of chained methods: select(), a series of mutate() commands to apply grep() statements to separate compund value in the measurements field into their own variables (columns) with meaningful names, another select() to limit columns and finally arrange() to set column and sort order.
 4.  Created "tidyAvg" data set, using summzarize(), group\_by for aggregation and then arrange to set column and sort order.
 
+#### Tidy Data Codebook
+
+A codebook which documents the data processing steps and provides details on the metadata for the resulting dataset is available here: [Tidy Data Codebook](https://github.com/rlugojr/Project_Tidy_Data/blob/master/codebook.md)
+
 #### Tidy Data Set
 
 This is a glimpse of the first "tidy" data set:
@@ -226,8 +230,6 @@ This is a glimpse of the deliverable, summary "tidy" dataset:
     ## 41     stdDev FALSE     FALSE    Z  21   -0.86
     ## 51     stdDev FALSE     FALSE <NA> 130   -0.91
     ## 61     stdDev FALSE      TRUE <NA>  65   -0.33
-
-#### Tidy Data Codebook
 
 ### Relevant Papers:
 

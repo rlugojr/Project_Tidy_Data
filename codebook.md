@@ -86,7 +86,7 @@ This was an exercise in proper chaining of many different dplyr and reshape2 fun
 
 Details for processing the summarized tidy dataset can be found here: [README.MD](https://github.com/rlugojr/Project_Tidy_Data#data-preparation)
 
-The dataset in a tab-delimited text file can be downloaded here: [UCI\_Analysis\_Summary\_Tidy.txt](https://github.com/rlugojr/Project_Tidy_Data/blob/master/data/UCI_Analysis_Summary_Tidy.txt)
+The dataset in a tab-delimited text file can be downloaded here: [UCI\_Analysis\_Summary\_Tidy.txt](https://github.com/rlugojr/Project_Tidy_Data/data/UCI_Analysis_Summary_Tidy.txt)
 
 This dataset was simple to generate when compared to the process for creating the initial tidy table. It was created with a chain of 3 functions. This was a much easier process only because the initial tidy table was available!
 
