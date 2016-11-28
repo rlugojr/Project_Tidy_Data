@@ -45,19 +45,19 @@ Data  <- within(Data, {
 
 #build "object" to hold report parts
 code.book.dtTidyAvg <- codebook(Data)
-code.book.dtTidyAvg.tableName <- "tidyDataAvg"
+code.book.dtTidyAvg.tableName <- "UCI_Analysis_Summary_Tidy"
 code.book.dtTidyAvg.columnDefs <- description(Data)
-code.book.dtTidyAvg.description <- "Tidy, agreggated dataset."
-code.book.dtTidyAvd.wording <- "Tidy version of original dataset, aggregated by observational variables and calculating the mean(value) of the included observations."
+code.book.dtTidyAvg.description <- "Tidy, agreggated, perfect dataset."
+code.book.dtTidyAvd.wording <- "Tidy version of the source dataset which provides the mean(value) from the subset of observations grouped by every variable."
 
 #example report
-cat("\n","-------------------------------------------------------------------\n\n", sep = "")
-cat(code.book.dtTidyAvg.tableName, " - ", code.book.dtTidyAvg.description, "\n\n", sep = "")
-cat(code.book.dtTidyAvd.wording, "\n\n", sep = "")
-cat("-------------------------------------------------------------------\n\n", sep = "")
-cat("Overview of Variables\n","________________\n", sep = "")
-print(code.book.dtTidyAvg.columnDefs)
-cat("\n\n\n")
-print(code.book.dtTidyAvg)
+# cat("\n","-------------------------------------------------------------------\n\n", sep = "")
+# cat(code.book.dtTidyAvg.tableName, " - ", code.book.dtTidyAvg.description, "\n\n", sep = "")
+# cat(code.book.dtTidyAvd.wording, "\n\n", sep = "")
+# cat("-------------------------------------------------------------------\n\n", sep = "")
+# cat("Overview of Variables\n","________________\n", sep = "")
+# print(code.book.dtTidyAvg.columnDefs)
+# cat("\n\n\n")
+# print(code.book.dtTidyAvg)
 
 

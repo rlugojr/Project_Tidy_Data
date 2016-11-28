@@ -1,19 +1,18 @@
 -   [run\_analysis.R - Tidy data processing script](#run_analysis.r---tidy-data-processing-script)
-    -   [****Script Begins****](#script-begins)
-        -   [Prepare the environment](#prepare-the-environment)
-        -   [Retrieve unprocessed data](#retrieve-unprocessed-data)
-        -   [Read specific data files into respective data tables.](#read-specific-data-files-into-respective-data-tables.)
-        -   [Add meaningful column names](#add-meaningful-column-names)
-        -   [CBIND and RBIND to create "master" data table.](#cbind-and-rbind-to-create-master-data-table.)
-        -   [Add meaningful activity names to associated observations through join by activityID](#add-meaningful-activity-names-to-associated-observations-through-join-by-activityid)
-        -   [Create first level *tidy* dataset](#create-first-level-tidy-dataset)
-        -   [Create Summarized *tidy* dataset (deliverable)](#create-summarized-tidy-dataset-deliverable)
-        -   [Validate records by joining both processed tables and verifying row counts match.](#validate-records-by-joining-both-processed-tables-and-verifying-row-counts-match.)
-        -   [Write dataset to tab delimited text file](#write-dataset-to-tab-delimited-text-file)
-    -   [****Script Ends****](#script-ends)
+-   [****Script Begins****](#script-begins)
+    -   [Prepare the environment](#prepare-the-environment)
+    -   [Retrieve unprocessed data](#retrieve-unprocessed-data)
+    -   [Read specific data files into respective data tables.](#read-specific-data-files-into-respective-data-tables.)
+    -   [Add meaningful column names](#add-meaningful-column-names)
+    -   [CBIND and RBIND to create "master" data table.](#cbind-and-rbind-to-create-master-data-table.)
+    -   [Add meaningful activity names to associated observations through join by activityID](#add-meaningful-activity-names-to-associated-observations-through-join-by-activityid)
+    -   [Create first level *tidy* dataset](#create-first-level-tidy-dataset)
+    -   [Create Summarized *tidy* dataset (deliverable)](#create-summarized-tidy-dataset-deliverable)
+    -   [Validate records by joining both processed tables and verifying row counts match.](#validate-records-by-joining-both-processed-tables-and-verifying-row-counts-match.)
+    -   [Write dataset to tab delimited text file](#write-dataset-to-tab-delimited-text-file)
+-   [****Script Ends****](#script-ends)
 
-run\_analysis.R - Tidy data processing script
----------------------------------------------
+### run\_analysis.R - Tidy data processing script
 
 The purpose of "run\_analysis.R" is to:
 1. Create a 'tidy' data table from the "train"" and "test"" sets.

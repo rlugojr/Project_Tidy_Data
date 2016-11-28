@@ -1,14 +1,17 @@
 ---
 title: "Project Tidy Data - Codebook"
 author: "Ray Lugo, Jr."
-date: Sys.Date()
+date: "November 25, 2016"
 output:
-  html_document:
-    keep_md: yes
+  md_document:
+    toc: yes
+    toc_depth: 5
+    variant: markdown_github
 ---
-## Project Tidy Data Codebook
-
-### Description
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, comment = '')
+```
+### Codebook Description
 
 This codebook provides details on:
 
@@ -21,7 +24,7 @@ This codebook provides details on:
 - Data Dictionary of all variables in the summarized Tidy dataset.
 - Initial statistics about the summarized tidy data set.
 
-###Overview of the original dataset.
+### Overview of the original dataset.
 
 ### Data Processing Method
 
@@ -33,36 +36,37 @@ Short, high-level description of what the cleaning script does.
 
 [link to the readme document that describes the code in greater detail]()
 
-### Overview of the initial Tidy data set.
-
-### Overview of the Summarized Tidy data set
-
-### Data Dictionary of all variables in the Summarized Tidy dataset.
+### Initial Tidy data set.
 
 
-##Description of the variables in the tiny_data.txt file
-General description of the file including:
- - Dimensions of the dataset
- - Summary of the data
- - Variables present in the dataset
- (you can easily use Rcode for this, just load the dataset and provide the information directly form the tidy data file)
+### Summarized Tidy data set
 
-```{r}
-cat(code.book.dtTidyAvg.tableName, " - ", code.book.dtTidyAvg.description, "\n\n", sep = "")
-cat(code.book.dtTidyAvd.wording, "\n\n", sep = "")
-cat("----------\n\n", sep = "")
-cat("Overview of Variables\n","________________\n", sep = "")
-print(code.book.dtTidyAvg.columnDefs)
-cat("\n\n\n")
-print(code.book.dtTidyAvg)
+`r paste0(code.book.dtTidyAvg.tableName, " - ", code.book.dtTidyAvg.description, "\n\n")
+`r paste0(code.book.dtTidyAvd.wording, "\n\n")
+
+
+#### Listing of Variables
+
+```{r, echo=FALSE}
+eval(code.book.dtTidyAvg.columnDefs)
 ```
 
-### Initial statistics about the summarized tidy data set.
+#### Detailed Variable Information
 
-```{r pressure, echo=FALSE}
-plot(pressure)
+```{r, echo=FALSE}
+eval(code.book.dtTidyAvg)
+```
+
+#### Initial statistics about the summarized tidy data set.
+
+
+```{r pressure, echo=TRUE}
+glimpse(dtTidyAvg)
 ```
 
 
-##Sources
-Sources you used if any, otherise leave out.
+#### Sources
+
+https://gist.github.com/stevenworthington/3178163 <- function to load specified data files into data.tables withe the same name as the originating file.
+
+

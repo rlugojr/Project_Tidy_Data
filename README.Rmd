@@ -103,14 +103,11 @@ train/subject_train.txt | Each row identifies the partiipant who performed the a
 
 #### Loading
 
-Using R's base function "download.file" and the mode="libcurl" (for cross platform compatibility), the ZIP archive was downloaded to the "./data" directory.
+1. Using R's base function "download.file" and the mode="libcurl" (for cross platform compatibility), the ZIP archive was downloaded to the "./data" directory.
 https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip
-
-Created a vector to hold the ZIP filename (with internal path) for the files to load into tables.
-
-Used unzip() to extract only the files that were needed.
-
-With the help of a cool function found on Github (https://gist.github.com/stevenworthington/3178163), passed the filenames vector to the function and it created a data.table for each specified file, named after it's corresponding filename.
+2. Created a vector to hold the ZIP filename (with internal path) for the files to load into tables.
+3. Used unzip() to extract only the files that were needed.
+4. With the help of a cool function found on Github (https://gist.github.com/stevenworthington/3178163), passed the filenames vector to the function and it created a data.table for each specified file, named after it's corresponding filename.
 
 #### Preparation
 
