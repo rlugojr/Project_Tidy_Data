@@ -11,7 +11,11 @@ output:
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE, comment = '')
 ```
-### Codebook Description
+### Codebook
+
+A codebook is essential documentation which provides detailed information on method(s) used for data preparation and any useful metadata that should be taken into consideration for data processing, data storage and retrieval.  Precise and detailed information in a project codebook can help other researchers and analysts with their attempts to reproduce results, for the purpose of validation or perhaps to build upon your research for their experiments and analysis.
+
+#### Description
 
 This codebook provides details on:
 
@@ -24,49 +28,110 @@ This codebook provides details on:
 - Data Dictionary of all variables in the summarized Tidy dataset.
 - Initial statistics about the summarized tidy data set.
 
-### Overview of the original dataset.
 
-### Data Processing Method
+#### Overview of the original dataset.
 
-### Overview of run\_analysis.R
+An overview of the experiment and method of data collection has been documented in this repository's  [README.MD](https://github.com/rlugojr/Project_Tidy_Data#original-experiment)
 
-Short, high-level description of what the cleaning script does. 
-
-### Link to step-by-step commented documentation of run\_analysis.R
-
-[link to the readme document that describes the code in greater detail]()
-
-### Initial Tidy data set.
+The dataset used for this project can be retrieved here: [UCI Human Activity Recognition Dataset](https://d396qusza40orc.cloudfront.net/getdata%2Fprojectfiles%2FUCI%20HAR%20Dataset.zip)
 
 
-### Summarized Tidy data set
+#### Data Processing Method
 
-`r paste0(code.book.dtTidyAvg.tableName, " - ", code.book.dtTidyAvg.description, "\n\n")
-`r paste0(code.book.dtTidyAvd.wording, "\n\n")
+Automation of data processing using R scripts simplified the overall task.  Through analysis of the original dataset, understanding gained from the original documentation and the constant iterations and refinement while buidling the scripts, I was able to load the data, extract only the necessary tables of data, and use tools like reshapR and Dplyr to create "tidy" datasets which allow for easier manipulation, analyisis and reporting.  Through the use of scripts that can accurately and repeatably recreate the final data set, another reseercher or analyst can be confident that they will have the advantage of working with their own exact copy of the dataset.
 
 
-#### Listing of Variables
+##### Software and Library Versions
+
+```{r, echo=FALSE}
+cat("OS Version: ")
+cat(win.version())
+cat("R version: ", R.version.string, "\n")
+rsversion <- as.character(rstudioapi::versionInfo()$version[[1]])
+cat("RStudio version: ", rsversion)
+projPacks <- as.data.frame(installed.packages(noCache = TRUE))
+projPacks %>% dplyr::select(Package,Version) %>% filter(Package %in% c("data.table","dtplyr","dplyr","readr","stringr", "psych", "reshape2", "rmarkdown", "knitr", "memisc")) %>% arrange(Package,Version)
+```
+
+Notes:  Memisc is a useful package for creating a manually tedious section of the casebook.  Although you can do this using plain R code, the framework is available in Memisc and although the documentation is a bit lacking, once you understand how it works and how much time it will save in future projects, I am sure that this one will have a permanent place in the toolbox.  Knitr was used to automate the documentation generation process.  Incredibly flexible and simple to use.  The dynamic nature of the documentation, if designed correctly, means that code changes would never cause the need for modifying every document which references the changed code.  Another great addition to the toolbox, in my opinion.
+
+
+##### Overview of run\_analysis.R
+
+In order to create the final tidy dataset it was necessary to go through the steps of retreival of dataset, analysis of documents and data, preparation of data, transformation from its current form, and finally creating the tidy dataset.  Each of these steps are explained in the [README.MD](https://github.com/rlugojr/Project_Tidy_Data#data-preparation) file and are automated through the use of R scripts.
+
+The following software and packages were used and are recommended in order to prevent discrepancies due to differences in versions which could lead to incorrect data or negatively impact the scripts ability to complete the entire process successfully.
+
+
+##### run\_analysis.R, step-by-step commented documentation
+
+The data processing script file, run\_analysis.R, is also available in a Markdown document which details the scripted methods and programmatic logic, step by step alongside the actual code.  This version is available here: [run\_analysis.md](https://github.com/rlugojr/Project_Tidy_Data/blob/master/run_analysis.md).
+
+Please feel free to send pull requests with any improvements to the code.  I always welcome improvement and the chance to learn how to refactor my code for the sake of speed and efficiency (and my personal edification.)
+
+
+##### Initial Tidy data set
+
+Details for processing the initial tidy dataset can be found here: [README.MD](https://github.com/rlugojr/Project_Tidy_Data#data-preparation)
+
+This was an exercise in proper chaining of many different dplyr and reshape2 functions.  Initially it required the use of CBIND and RBIND several times and in the correct order.  Then, applying the headers and melting the columns and finally mutating the table to add the activity to each corresponding observation.  I went further by taking the values of the measurement table and using a series of grep statements to split the values into their own variable columns, filling it either with their respective values or using TRUE\\FALSE as values for the variables that had no actual values but where binary in nature (was or was not)  This produced a table with all variables as columns and one observation per row.
+
+
+##### Summarized Tidy data set
+
+Details for processing the summarized tidy dataset can be found here: [README.MD](https://github.com/rlugojr/Project_Tidy_Data#data-preparation)
+
+The dataset in a tab-delimited text file can be downloaded here: [UCI_Analysis_Summary_Tidy.txt](https://github.com/rlugojr/Project_Tidy_Data/data/UCI_Analysis_Summary_Tidy.txt)
+
+This dataset was simple to generate when compared to the process for creating the initial tidy table.  It was created with a chain of 3 functions.  This was a much easier process only because the initial tidy table was available!
+
+##### Summarized Tidy Dataset Info
+
+```{r, echo=FALSE}
+cat(code.book.dtTidyAvg.tableName, " - ", code.book.dtTidyAvg.description, "\n\n")
+cat(code.book.dtTidyAvd.wording, "\n\n")
+```
+
+##### Listing of Variables
 
 ```{r, echo=FALSE}
 eval(code.book.dtTidyAvg.columnDefs)
 ```
 
-#### Detailed Variable Information
+##### Detailed Variable Information
 
 ```{r, echo=FALSE}
 eval(code.book.dtTidyAvg)
 ```
 
-#### Initial statistics about the summarized tidy data set.
+##### Initial statistics about the summarized tidy data set.
 
 
-```{r pressure, echo=TRUE}
+```{r, echo=TRUE}
 glimpse(dtTidyAvg)
 ```
+
+```{r, echo=TRUE}
+headTail(dtTidyAvg, 20, 10, 10)
+```
+
+```{r, echo=TRUE}
+show(dtTidyAvg)
+```
+
+
 
 
 #### Sources
 
-https://gist.github.com/stevenworthington/3178163 <- function to load specified data files into data.tables withe the same name as the originating file.
+http://vita.had.co.nz/papers/tidy-data.pdf <- H.Wickham's article describing the concept and application of Tidy datasets.
 
+https://thoughtfulbloke.wordpress.com/2015/09/09/getting-and-cleaning-the-assignment/ <- Very thoughtful bloke, indeed.
 
+https://gist.github.com/stevenworthington/3178163 <- function to load specified data files into data.tables with the same name as the originating file.
+
+http://r.789695.n4.nabble.com/How-do-I-print-a-string-without-the-initial-1-td823144.html <- print without the annoying [1] output.
+
+http://yihui.name/knitr/ <- Dynamic Documentation at it's best.  Integrates smoothly with RStudio and Pandoc.
+
+http://www.martin-elff.net/knitr/memisc/codebook.html <- Get it, keep it, love it.

@@ -173,5 +173,5 @@ DITEN - Università degli Studi di Genova, Genoa (I-16145), Italy.
 Universitat Politècnica de Catalunya (BarcelonaTech). Vilanova i la Geltrú (08800), Spain
 activityrecognition '@' smartlab.ws
 
-https://gist.github.com/stevenworthington/3178163 <- function to load specified data files into data.tables withe the same name as the originating file.
+https://gist.github.com/stevenworthington/3178163 <- function to load specified data files into data.tables with the same name as the originating file.
 

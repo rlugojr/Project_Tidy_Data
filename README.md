@@ -247,4 +247,4 @@ Davide Anguita, Alessandro Ghio, Luca Oneto, Xavier Parra and Jorge L. Reyes-Ort
 
 Jorge L. Reyes-Ortiz(1,2), Davide Anguita(1), Alessandro Ghio(1), Luca Oneto(1) and Xavier Parra(2) 1 - Smartlab - Non-Linear Complex Systems Laboratory DITEN - UniversitÃ  degli Studi di Genova, Genoa (I-16145), Italy. 2 - CETpD - Technical Research Centre for Dependency Care and Autonomous Living Universitat PolitÃ¨cnica de Catalunya (BarcelonaTech). Vilanova i la GeltrÃº (08800), Spain activityrecognition '@' smartlab.ws
 
-<https://gist.github.com/stevenworthington/3178163> &lt;- function to load specified data files into data.tables withe the same name as the originating file.
+<https://gist.github.com/stevenworthington/3178163> &lt;- function to load specified data files into data.tables with the same name as the originating file.
