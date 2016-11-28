@@ -205,7 +205,7 @@ rm("dtMatch")
 print("writing datasets to csv files in './data' folder.")
 #Uncomment next line to export the first Tidy dataset to file.
 #write.csv(dtTidy, "./data/UCI_Analysis_Tidy.csv", na = "NA")
-write.table(dtTidyAvg, "./data/UCI_Analysis_Summary_Tidy.txt", quote = FALSE, na = "NA")
+write.table(dtTidyAvg, "./data/UCI_Analysis_Summary_Tidy.txt", quote = FALSE, na = "NA", row.name=FALSE)
 print(paste0("data table exported to ", getwd(),"/data/UCI_Analysis_Summary_Tidy.txt"))
 
 print(paste("processing completed at :", Sys.time()))
