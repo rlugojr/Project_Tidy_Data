@@ -1,34 +1,44 @@
 ---
-title: "Project Tidy Data - Codebook template"
+title: "Project Tidy Data - Codebook"
 author: "Ray Lugo, Jr."
 date: Sys.Date()
 output:
   html_document:
     keep_md: yes
 ---
+## Project Tidy Data Codebook
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+### Description
 
-## Project Description
-Short description of the project
+This codebook provides details on:
 
-##Study design and data processing
+- Overview of the original dataset.
+- Data processing method.
+- Overview of run\_analysis.R
+- Link to step-by-step commented documentation of run\_analysis.R
+- Overview of the initial Tidy data set.
+- Overview of the Summarized Tidy data set
+- Data Dictionary of all variables in the summarized Tidy dataset.
+- Initial statistics about the summarized tidy data set.
 
-###Collection of the raw data
-Description of how the data was collected.
+###Overview of the original dataset.
 
-###Notes on the original (raw) data 
-Some additional notes (if avaialble, otherwise you can leave this section out).
+### Data Processing Method
 
-##Creating the tidy datafile
+### Overview of run\_analysis.R
 
-###Guide to create the tidy data file
-Description on how to create the tidy data file (1. download the data, ...)/
+Short, high-level description of what the cleaning script does. 
 
-###Cleaning of the data
-Short, high-level description of what the cleaning script does. [link to the readme document that describes the code in greater detail]()
+### Link to step-by-step commented documentation of run\_analysis.R
+
+[link to the readme document that describes the code in greater detail]()
+
+### Overview of the initial Tidy data set.
+
+### Overview of the Summarized Tidy data set
+
+### Data Dictionary of all variables in the Summarized Tidy dataset.
+
 
 ##Description of the variables in the tiny_data.txt file
 General description of the file including:
@@ -37,29 +47,22 @@ General description of the file including:
  - Variables present in the dataset
  (you can easily use Rcode for this, just load the dataset and provide the information directly form the tidy data file)
 
-```{r cars}
-summary(cars)
+```{r}
+cat(code.book.dtTidyAvg.tableName, " - ", code.book.dtTidyAvg.description, "\n\n", sep = "")
+cat(code.book.dtTidyAvd.wording, "\n\n", sep = "")
+cat("----------\n\n", sep = "")
+cat("Overview of Variables\n","________________\n", sep = "")
+print(code.book.dtTidyAvg.columnDefs)
+cat("\n\n\n")
+print(code.book.dtTidyAvg)
 ```
 
-###Variable 1 (repeat this section for all variables in the dataset)
-Short description of what the variable describes.
-
-Some information on the variable including:
- - Class of the variable
- - Unique values/levels of the variable
- - Unit of measurement (if no unit of measurement list this as well)
- - In case names follow some schema, describe how entries were constructed (for example time-body-gyroscope-z has 4 levels of descriptors. Describe these 4 levels). 
-
-(you can easily use Rcode for this, just load the dataset and provide the information directly form the tidy data file)
+### Initial statistics about the summarized tidy data set.
 
 ```{r pressure, echo=FALSE}
 plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
-
-####Notes on variable 1:
-If available, some additional notes on the variable not covered elsewehere. If no notes are present leave this section out.
 
 ##Sources
 Sources you used if any, otherise leave out.

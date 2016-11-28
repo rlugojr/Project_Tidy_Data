@@ -24,19 +24,19 @@ Data  <- within(Data, {
     description(magnitude) <- "Magnitude calculated?"
     description(axis) <- "Axis observed, as calculated from the triaxial signal."
     description(obs) <- "The number of observations used to calculate the average."
-    description(average) <- "The average of the aggregated measurements."
+    description(average) <- "The average of value from the aggregated observations"
 
     wording(subjectID) <- "ID number associated with each study participant, used to maintain anonimity."
     wording(activityName) <- "Actions performed while signal measurements were recorded."
     wording(domain) <- "Specifies if signals generated were time-domain(t) only or had Fast Fourier Transform(f) applied."
     wording(signal_type) <- "Denotes if the generated signal was processed using a low pass Butterworth filter with corner frequency of 0.3Hz"
     wording(sensor) <- "The instrument used to measure and record the signal."
-    wording(statistic) <- "The statistical function that was used to calculate the original observed value."
+    wording(statistic) <- "The statistical function, mean or standard deviation, used to calculate the original observed value."
     wording(jerk) <- "Specifies if the body-linear acceleration and angular velocity were derived in time to record Jerk signals."
     wording(magnitude) <- "Specifies if the 'Euclidean norm' was used to calculate the three dimensional signals."
     wording(axis) <- "Specifies which axis (X, Y, X) of the triaxial signal was isolated and recorded."
     wording(obs) <- "The number of observations aggregated and used to calculate the average value"
-    wording(average) <- "The average value, calculated from the aggregation of observations with the same variable values."
+    wording(average) <- "The average value of the aggregated observations, grouped by the applicable variables."
 
     foreach(x <- c(obs,average),{
         annotation(x)["Remark"] <- "All values in the dataset were used for the summary analysis and therefore are not accurate representations of actual observations."
@@ -55,7 +55,7 @@ cat("\n","-------------------------------------------------------------------\n\
 cat(code.book.dtTidyAvg.tableName, " - ", code.book.dtTidyAvg.description, "\n\n", sep = "")
 cat(code.book.dtTidyAvd.wording, "\n\n", sep = "")
 cat("-------------------------------------------------------------------\n\n", sep = "")
-cat("Data Definitions\n","________________\n", sep = "")
+cat("Overview of Variables\n","________________\n", sep = "")
 print(code.book.dtTidyAvg.columnDefs)
 cat("\n\n\n")
 print(code.book.dtTidyAvg)
